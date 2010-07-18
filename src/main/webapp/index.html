@@ -1,0 +1,16 @@
+<lift:surround with="default" at="content">
+		<h2>Welcome to your project!</h2>
+		<p>
+      <lift:helloWorld.howdy>
+        <span>Welcome to LSUG-Akka-Lift-Demo at <b:time/></span>
+      </lift:helloWorld.howdy>
+    </p>
+
+ <lift:comet type="DCometActor">
+   <h1><comet:user/></h1>
+   <br/>
+   <comet:tags/>
+</lift:comet>
+
+</lift:surround>
+
