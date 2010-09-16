@@ -1,13 +1,13 @@
 package lsug {
 package snippet {
 
-import _root_.scala.xml.NodeSeq
-import _root_.net.liftweb.util.Helpers
+import scala.xml.NodeSeq
+import net.liftweb.util.Helpers
 import Helpers._
 
 class HelloWorld {
   def howdy(in: NodeSeq): NodeSeq =
-    Helpers.bind("b", in, "time" -> (new _root_.java.util.Date).toString)
+    Helpers.bind("b", in, "time" -> (new java.util.Date).toString)
 }
 
 }

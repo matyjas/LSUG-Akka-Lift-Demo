@@ -1,7 +1,8 @@
 package lsug.model
 
-import se.scalablesolutions.akka.actor.Actor
+import se.scalablesolutions.akka.actor.{Actor,Supervisor}
 import se.scalablesolutions.akka.actor.Actor._
+import se.scalablesolutions.akka.config.ScalaConfig._
 
 import dispatch._
 
@@ -10,16 +11,38 @@ case class DTags(tags: List[String])
 
 object DTagActor {
 
-  def anActor = actorOf[DTagActor].start
+  val supervisor = Supervisor(
+  SupervisorConfig(
+    RestartStrategy(OneForOne, 3, 1000, List(classOf[Exception])),
+    Supervise(
+      actorOf[DTagActor],
+      LifeCycle(Permanent)) ::
+    Nil))
+
+  def anActor = {
+    val dta = actorOf[DTagActor].start
+    supervisor.link(dta)
+    dta
+  }
 
 }
 
 class DTagActor extends Actor {
 
+  self.lifeCycle = Some(LifeCycle(Permanent))
+
+  var client: Option[{def !(msg:Any):Unit}] = None
+
+  override def preRestart(reason: Throwable) = {
+
+    client foreach (_ ! DTags(Nil))
+  }
+
   def receive = {
     
     case DUser(userName, comet) => 
 
+      client = Some(comet)
       val http = new Http
       val req = :/("feeds.delicious.com") / "v2" / "rss" / "tags" / userName
       val tagTitles = http ( req <> { _ \\ "item" \\ "title"} )
